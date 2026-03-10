@@ -6,9 +6,13 @@ import { PersonDto } from './dto/person.dto';
 export class PersonController {
   constructor(private readonly personService: PersonService) {}
 
+  // @Post()
+  // createAndUpdate(@Body() personDto: PersonDto) {
+  //   return this.personService.createAndUpdate(personDto);
+  // }
   @Post()
-  createAndUpdate(@Body() personDto: PersonDto) {
-    return this.personService.createAndUpdate(personDto);
+  create(@Body() dto: PersonDto) {
+    return this.personService.createAndUpdate(dto);
   }
 
   @Get()
@@ -18,7 +22,7 @@ export class PersonController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.personService.findOne(+id);
+    return this.personService.findById(+id);
   }
 
   @Delete(':id')
