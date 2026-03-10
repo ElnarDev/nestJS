@@ -15,7 +15,11 @@ export class PersonService {
   ) {}
 
   async findAll() {
-    return await this.personRepo.find();
+    return await this.personRepo.find({
+      order: {
+        id: 'ASC',
+      },
+    });
   }
 
   async findById(id: number) {
@@ -34,25 +38,8 @@ export class PersonService {
     }
   }
 
-  createAndUpdatee(personDto: PersonDto) {
-    const exists = this.persons.some((person) => person.id === personDto.id);
-    if (exists) {
-      this.persons = this.persons.map((person) =>
-        person.id === personDto.id ? { ...person, ...personDto } : person,
-      );
-      return this.persons.find((person) => person.id === personDto.id);
-    } else {
-      const newPerson: PersonDto = {
-        ...personDto,
-        id: ++this.lastId,
-      };
-      this.persons.push(newPerson);
-      return newPerson;
-    }
-  }
-
-  remove(id: number) {
-    this.persons = this.persons.filter((person) => person.id !== id);
+  async delete(id: number) {
+    await this.personRepo.delete({ id });
     return { message: `Person with id ${id} removed` };
   }
 }
