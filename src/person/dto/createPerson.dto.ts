@@ -1,6 +1,5 @@
 import { Transform } from 'class-transformer';
-import { IsInt, IsString, Max, Min, MinLength } from 'class-validator';
-import { Gender } from './enums/gender.enum';
+import { IsEmail, IsString, MinLength } from 'class-validator';
 
 export class CreatePersonDto {
   @IsString()
@@ -8,12 +7,10 @@ export class CreatePersonDto {
   @Transform(({ value }) => (value as string).trim())
   name!: string;
 
-  @IsInt()
-  @Min(1, { message: 'Age must be a positive integer' })
-  @Max(120, { message: 'Age must be a realistic value' })
-  age!: number;
+  @IsEmail({}, { message: 'Email must be a valid email address' })
+  email!: string;
 
-  //gender enum if user dont provide it, it will be set to 'other'
   @IsString()
-  gender!: Gender;
+  @MinLength(6, { message: 'Password must be at least 6 characters long' })
+  password!: string;
 }

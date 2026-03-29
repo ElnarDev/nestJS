@@ -398,3 +398,7 @@ Temporary Items
 dist
 .webpack
 .serverless/**/*.zip
+
+# SSH Keys - never commit private keys
+sshKey
+sshKey.pub
