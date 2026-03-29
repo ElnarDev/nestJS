@@ -12,17 +12,17 @@
 | `2`   | EDITOR        |
 | `3`   | VISUALIZADOR  |
 
-> Al crear una nota, el usuario creador recibe automáticamente el rol **ADMINISTRADOR (1)**.
+> Al crear una note, el usuario creador recibe automáticamente el rol **ADMINISTRADOR (1)**.
 
 ---
 
-## Flujo completo: crear una nota compartida con dos roles
+## Flujo completo: crear una note compartida con dos roles
 
 ### Paso 1 — Crear los usuarios
 
-**`POST /api/v2/person`**
+**`POST /api/v2/usuario`**
 
-Crear el usuario propietario (quien creará la nota):
+Crear el usuario propietario (quien creará la note):
 
 ```json
 {
@@ -54,17 +54,17 @@ Respuesta esperada:
 
 ---
 
-### Paso 2 — Crear la nota
+### Paso 2 — Crear la note
 
-**`POST /api/v2/nota`**
+**`POST /api/v2/note`**
 
-El campo `personId` indica quién es el propietario. Se asigna automáticamente el rol **ADMINISTRADOR**.
+El campo `usuarioId` indica quién es el propietario. Se asigna automáticamente el rol **ADMINISTRADOR**.
 
 ```json
 {
-  "title": "Mi primera nota compartida",
-  "content": "Contenido de la nota",
-  "personId": 1
+  "title": "Mi primera note compartida",
+  "content": "Contenido de la note",
+  "usuarioId": 1
 }
 ```
 
@@ -73,8 +73,8 @@ Respuesta esperada:
 ```json
 {
   "id": 1,
-  "title": "Mi primera nota compartida",
-  "content": "Contenido de la nota",
+  "title": "Mi primera note compartida",
+  "content": "Contenido de la note",
   "activo": true,
   "created_at": "2026-03-25T00:00:00.000Z"
 }
@@ -84,11 +84,11 @@ Respuesta esperada:
 
 ---
 
-### Paso 3 — Compartir la nota con otro usuario
+### Paso 3 — Compartir la note con otro usuario
 
 **`POST /api/v2/note-share`**
 
-Asignar rol **EDITOR (2)** al usuario 2 sobre la nota 1:
+Asignar rol **EDITOR (2)** al usuario 2 sobre la note 1:
 
 ```json
 {
@@ -108,24 +108,24 @@ Para asignar rol **VISUALIZADOR (3)** a un tercer usuario:
 }
 ```
 
-> Si el usuario ya tiene un rol en esa nota, el endpoint actualiza el rol existente (no duplica).
+> Si el usuario ya tiene un rol en esa note, el endpoint actualiza el rol existente (no duplica).
 
 ---
 
-### Paso 4 — Verificar la nota con todos sus usuarios y roles
+### Paso 4 — Verificar la note con todos sus usuarios y roles
 
-**`GET /api/v2/nota/detail`**
+**`GET /api/v2/note/detail`**
 
 Respuesta esperada:
 
 ```json
 [
   {
-    "nota_id": 1,
-    "nota_title": "Mi primera nota compartida",
+    "note_id": 1,
+    "note_title": "Mi primera note compartida",
     "usuarios": [
-      { "person_id": 1, "person_name": "Carlos Lopez",  "role": "ADMINISTRADOR" },
-      { "person_id": 2, "person_name": "Maria Garcia",  "role": "EDITOR" }
+      { "usuario_id": 1, "usuario_name": "Carlos Lopez",  "role": "ADMINISTRADOR" },
+      { "usuario_id": 2, "usuario_name": "Maria Garcia",  "role": "EDITOR" }
     ]
   }
 ]
@@ -135,45 +135,116 @@ Respuesta esperada:
 
 ## Referencia completa de rutas
 
-### Usuarios (`/person`)
+### Usuarios (`/usuario`)
 
 | Método   | Ruta               | Descripción               | Body requerido                          |
 |----------|--------------------|---------------------------|-----------------------------------------|
-| `POST`   | `/person`          | Crear / actualizar usuario | `name`, `email`, `password`             |
-| `GET`    | `/person`          | Listar todos los usuarios  | —                                       |
-| `GET`    | `/person/:id`      | Obtener usuario por ID     | —                                       |
-| `DELETE` | `/person/:id`      | Eliminar usuario           | —                                       |
+| `POST`   | `/usuario`         | Crear / actualizar usuario | `name`, `email`, `password`             |
+| `GET`    | `/usuario`         | Listar todos los usuarios  | —                                       |
+| `GET`    | `/usuario/:id`     | Obtener usuario por ID     | —                                       |
+| `DELETE` | `/usuario/:id`     | Eliminar usuario           | —                                       |
 
 ---
 
-### Notas (`/nota`)
+### Notes (`/note`)
 
-| Método   | Ruta                     | Descripción                                      | Body requerido                  |
-|----------|--------------------------|--------------------------------------------------|---------------------------------|
-| `POST`   | `/nota`                  | Crear nota (asigna ADMINISTRADOR automáticamente) | `title`, `content`, `personId` |
-| `GET`    | `/nota`                  | Listar todas las notas                            | —                               |
-| `GET`    | `/nota/detail`           | Notas con usuarios y roles en texto               | —                               |
-| `GET`    | `/nota/person/:personId` | Notas accesibles por un usuario                   | —                               |
-| `GET`    | `/nota/:id`              | Obtener nota por ID                               | —                               |
-| `DELETE` | `/nota/:id`              | Eliminar nota (y sus shares en cascada)           | —                               |
+| Método   | Ruta                         | Descripción                                      | Body requerido                   |
+|----------|------------------------------|--------------------------------------------------|----------------------------------|
+| `POST`   | `/note`                      | Crear note (asigna ADMINISTRADOR automáticamente) | `title`, `content`, `usuarioId` |
+| `GET`    | `/note`                      | Listar todas las notes                            | —                                |
+| `GET`    | `/note/detail`               | Notes con usuarios y roles en texto               | —                                |
+| `GET`    | `/note/usuario/:usuarioId`   | Notes accesibles por un usuario                   | —                                |
+| `GET`    | `/note/:id`                  | Obtener note por ID                               | —                                |
+| `DELETE` | `/note/:id`                  | Eliminar note (y sus shares en cascada)           | —                                |
 
 ---
 
-### Compartir notas (`/note-share`)
+### Compartir notes (`/note-share`)
 
-| Método   | Ruta                         | Descripción                              | Body requerido                       |
-|----------|------------------------------|------------------------------------------|--------------------------------------|
-| `POST`   | `/note-share`                | Asignar o actualizar rol en una nota     | `note_id`, `usuario_id`, `role`      |
-| `GET`    | `/note-share`                | Listar todos los shares                  | —                                    |
-| `GET`    | `/note-share/nota/:notaId`   | Shares de una nota específica            | —                                    |
-| `GET`    | `/note-share/person/:personId` | Shares de un usuario específico        | —                                    |
-| `DELETE` | `/note-share/:id`            | Eliminar un share por ID                 | —                                    |
+| Método   | Ruta                              | Descripción                              | Body requerido                       |
+|----------|-----------------------------------|------------------------------------------|--------------------------------------|
+| `POST`   | `/note-share`                     | Asignar o actualizar rol en una note     | `note_id`, `usuario_id`, `role`      |
+| `GET`    | `/note-share`                     | Listar todos los shares                  | —                                    |
+| `GET`    | `/note-share/note/:noteId`        | Shares de una note específica            | —                                    |
+| `GET`    | `/note-share/usuario/:usuarioId`  | Shares de un usuario específico          | —                                    |
+| `DELETE` | `/note-share/:id`                 | Eliminar un share por ID                 | —                                    |
 
 ---
 
 ## Restricciones de la BD
 
-- Un usuario solo puede tener **un rol por nota** (`UNIQUE note_id + usuario_id`)
-- Borrar una nota elimina automáticamente todos sus shares (`ON DELETE CASCADE`)
+- Un usuario solo puede tener **un rol por note** (`UNIQUE note_id + usuario_id`)
+- Borrar una note elimina automáticamente todos sus shares (`ON DELETE CASCADE`)
 - Borrar un usuario elimina automáticamente sus shares (`ON DELETE CASCADE`)
 - El campo `role` acepta solo los valores `1`, `2` o `3`
+
+---
+
+### Recordatorios (`/recordatorio`)
+
+| Método   | Ruta                              | Descripción                            | Body requerido          |
+|----------|-----------------------------------|----------------------------------------|-------------------------|
+| `POST`   | `/recordatorio`                   | Crear recordatorio vinculado a una note | `note_id`, `activo?`   |
+| `GET`    | `/recordatorio`                   | Listar todos los recordatorios          | —                       |
+| `GET`    | `/recordatorio/note/:noteId`      | Recordatorios de una note específica    | —                       |
+| `GET`    | `/recordatorio/:id`               | Obtener recordatorio por ID             | —                       |
+| `DELETE` | `/recordatorio/:id`               | Eliminar recordatorio                   | —                       |
+
+**Body `POST /recordatorio`:**
+```json
+{
+  "note_id": 1,
+  "activo": true
+}
+```
+
+**Respuesta esperada:**
+```json
+{
+  "id": 1,
+  "note_id": 1,
+  "activo": true,
+  "created_at": "2026-03-29T00:00:00.000Z",
+  "updated_at": "2026-03-29T00:00:00.000Z"
+}
+```
+
+---
+
+### Attachments (`/attachment`)
+
+> Todos los endpoints usan método **POST**.  
+> El campo `file_data` debe enviarse en **Base64**.
+
+| Método | Ruta                       | Descripción                        | Body requerido                                            |
+|--------|----------------------------|------------------------------------|-----------------------------------------------------------|
+| `POST` | `/attachment/getall`       | Listar todos los archivos           | —                                                         |
+| `POST` | `/attachment/getbyid/:id`  | Obtener un archivo específico       | —                                                         |
+| `POST` | `/attachment/save`         | Crear archivo vinculado a una note  | `note_id`, `file_name`, `file_type`, `file_data`, `file_size?` |
+| `POST` | `/attachment/delete/:id`   | Eliminar un archivo                 | —                                                         |
+
+**Body `POST /attachment/save`:**
+```json
+{
+  "note_id": 1,
+  "file_name": "documento.pdf",
+  "file_type": "application/pdf",
+  "file_size": 20480,
+  "file_data": "JVBERi0xLjQKJ..."
+}
+```
+
+**Respuesta esperada:**
+```json
+{
+  "id": 1,
+  "note_id": 1,
+  "file_name": "documento.pdf",
+  "file_type": "application/pdf",
+  "file_size": 20480,
+  "created_at": "2026-03-29T00:00:00.000Z",
+  "updated_at": "2026-03-29T00:00:00.000Z"
+}
+```
+
+> `file_data` no se retorna en `getall` ni en `save` para evitar respuestas pesadas. Solo se incluye en `getbyid`.

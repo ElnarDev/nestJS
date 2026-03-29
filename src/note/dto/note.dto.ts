@@ -1,6 +1,6 @@
 import { IsBoolean, IsInt, IsOptional, IsString, MinLength } from 'class-validator';
 
-export class NotaDto {
+export class NoteDto {
   @IsOptional()
   @IsInt()
   id?: number;
@@ -20,5 +20,5 @@ export class NotaDto {
   // Solo requerido al crear la nota (se asigna como ADMINISTRADOR)
   @IsOptional()
   @IsInt()
-  personId?: number;
+  usuarioId?: number;
 }

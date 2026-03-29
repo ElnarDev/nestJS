@@ -2,8 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { NoteShare } from './entities/note-share.entity';
-import { Nota } from '../nota/entities/nota.entity';
-import { Person } from '../person/entities/person.entity';
+import { Note } from '../note/entities/note.entity';
+import { Usuario } from '../usuario/entities/usuario.entity';
 import { NoteShareDto } from './dto/note-share.dto';
 
 @Injectable()
@@ -15,7 +15,7 @@ export class NoteShareService {
 
   async findAll() {
     return await this.noteShareRepo.find({
-      relations: ['nota', 'person'],
+      relations: ['note', 'usuario'],
       order: { id: 'ASC' },
     });
   }
@@ -23,7 +23,7 @@ export class NoteShareService {
   async findByNota(notaId: number) {
     return await this.noteShareRepo.find({
       where: { note_id: notaId },
-      relations: ['nota', 'person'],
+      relations: ['note', 'usuario'],
       order: { id: 'ASC' },
     });
   }
@@ -31,7 +31,7 @@ export class NoteShareService {
   async findByPerson(personId: number) {
     return await this.noteShareRepo.find({
       where: { usuario_id: personId },
-      relations: ['nota', 'person'],
+      relations: ['note', 'usuario'],
       order: { id: 'ASC' },
     });
   }
@@ -48,8 +48,8 @@ export class NoteShareService {
 
     const newShare = this.noteShareRepo.create({
       role: dto.role,
-      nota: { id: dto.note_id } as Nota,
-      person: { id: dto.usuario_id } as Person,
+      note: { id: dto.note_id } as Note,
+      usuario: { id: dto.usuario_id } as Usuario,
       note_id: dto.note_id,
       usuario_id: dto.usuario_id,
     });

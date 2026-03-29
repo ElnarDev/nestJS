@@ -16,14 +16,14 @@ export class NoteShareController {
     return this.noteShareService.findAll();
   }
 
-  @Get('nota/:notaId')
-  findByNota(@Param('notaId') notaId: string) {
-    return this.noteShareService.findByNota(+notaId);
+  @Get('note/:noteId')
+  findByNota(@Param('noteId') noteId: string) {
+    return this.noteShareService.findByNota(+noteId);
   }
 
-  @Get('person/:personId')
-  findByPerson(@Param('personId') personId: string) {
-    return this.noteShareService.findByPerson(+personId);
+  @Get('usuario/:usuarioId')
+  findByPerson(@Param('usuarioId') usuarioId: string) {
+    return this.noteShareService.findByPerson(+usuarioId);
   }
 
   @Delete(':id')

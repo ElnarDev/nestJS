@@ -1,9 +1,11 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PersonModule } from './person/person.module';
-import { NotaModule } from './nota/nota.module';
+import { UsuarioModule } from './usuario/usuario.module';
+import { NoteModule } from './note/note.module';
 import { NoteShareModule } from './note-share/note-share.module';
+import { RecordatorioModule } from './recordatorio/recordatorio.module';
+import { AttachmentModule } from './attachment/attachment.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
@@ -14,9 +16,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    PersonModule,
-    NotaModule,
+    UsuarioModule,
+    NoteModule,
     NoteShareModule,
+    RecordatorioModule,
+    AttachmentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -6,19 +6,19 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('usuario')
-export class Person {
+@Entity('note')
+export class Note {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 255 })
-  name: string;
+  title: string;
 
-  @Column({ type: 'varchar', length: 255, unique: true })
-  email: string;
+  @Column({ type: 'text' })
+  content: string;
 
-  @Column({ type: 'varchar', length: 255 })
-  password: string;
+  @Column({ type: 'boolean', default: true })
+  activo: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   created_at: Date;
