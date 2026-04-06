@@ -57,11 +57,33 @@ export class NoteShareService {
   }
 
   async delete(id: number) {
-    const share = await this.noteShareRepo.findOneBy({ id });
+    const share = await this.findById(id);
     if (!share) {
       throw new NotFoundException(`NoteShare with id ${id} not found`);
     }
     await this.noteShareRepo.delete({ id });
     return { message: `NoteShare with id ${id} removed` };
+  }
+
+  async findById(id: number) {
+    const data = await this.noteShareRepo.findOne({
+      where: { id },
+      relations: ['note', 'usuario'],
+      select: {
+        id: true,
+        role: true,
+        note: {
+          id: true,
+          title: true,
+        },
+        usuario: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      },
+    });
+
+    return data;
   }
 }
