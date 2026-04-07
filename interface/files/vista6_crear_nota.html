@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>GlassKeep - Crear Nota</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.16);
+    --accent: #a78bfa;
+    --text: rgba(255,255,255,0.92);
+    --text-muted: rgba(255,255,255,0.45);
+    --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  body { font-family: 'Outfit', sans-serif; min-height: 100vh; background: linear-gradient(135deg, #0f0c29 0%, #1a0533 30%, #0c2340 60%, #041024 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 28px; position: relative; overflow: hidden; padding: 40px; }
+  .blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: 0.35; pointer-events: none; }
+  .blob1 { width: 500px; height: 500px; background: radial-gradient(circle, #7c3aed, transparent); top: -100px; left: -100px; }
+  .blob2 { width: 400px; height: 400px; background: radial-gradient(circle, #0ea5e9, transparent); bottom: 50px; right: 50px; }
+  .blob3 { width: 300px; height: 300px; background: radial-gradient(circle, #ec4899, transparent); top: 200px; right: 100px; opacity: 0.2; }
+
+  /* Collapsed state */
+  .create-bar-collapsed {
+    width: 600px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 16px;
+    backdrop-filter: blur(24px);
+    box-shadow: var(--shadow);
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .create-bar-collapsed span { color: var(--text-muted); font-size: 15px; flex: 1; }
+  .bar-icons { display: flex; gap: 6px; }
+  .bar-icon { width: 34px; height: 34px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .bar-icon:hover { background: rgba(255,255,255,0.1); }
+
+  /* Expanded editor inline */
+  .create-expanded {
+    width: 600px;
+    background: rgba(255,255,255,0.09);
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 20px;
+    backdrop-filter: blur(40px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.12);
+    overflow: hidden;
+  }
+  .expanded-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px 10px;
+  }
+  .title-input { background: none; border: none; outline: none; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 17px; font-weight: 600; width: 100%; }
+  .title-input::placeholder { color: var(--text-muted); font-weight: 400; }
+  .pin-btn { width: 30px; height: 30px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+  .check-row {
+    display: flex; align-items: center; gap: 12px; padding: 8px 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .drag-dots { opacity: 0.3; cursor: grab; }
+  .check-row input[type=checkbox] { width: 15px; height: 15px; accent-color: var(--accent); flex-shrink: 0; }
+  .check-row .item-input { background: none; border: none; outline: none; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 14px; flex: 1; caret-color: var(--accent); }
+  .check-row .item-input::placeholder { color: var(--text-muted); }
+  .del-btn { width: 22px; height: 22px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.5; }
+
+  .add-row { display: flex; align-items: center; gap: 12px; padding: 10px 20px 12px; cursor: pointer; }
+  .add-row span { color: var(--text-muted); font-size: 14px; }
+
+  .expanded-footer {
+    display: flex; align-items: center; padding: 10px 14px;
+    border-top: 1px solid rgba(255,255,255,0.07);
+    gap: 3px;
+  }
+  .foot-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .foot-btn:hover { background: rgba(255,255,255,0.08); }
+  .foot-btn.special { border: 1px solid rgba(167,139,250,0.4); background: rgba(167,139,250,0.12); }
+  .spacer { flex: 1; }
+  .close-btn {
+    padding: 6px 18px; border-radius: 10px; border: 1px solid rgba(167,139,250,0.35);
+    background: rgba(167,139,250,0.18); color: var(--accent);
+    font-family: 'Outfit', sans-serif; font-size: 14px; font-weight: 500; cursor: pointer;
+  }
+
+  /* Section label */
+  .section-label {
+    font-size: 11px; color: rgba(167,139,250,0.6); text-transform: uppercase; letter-spacing: 1.2px;
+    margin-bottom: 8px; font-weight: 600;
+  }
+
+  /* Cursor blink animation */
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+  .cursor { display: inline-block; width: 2px; height: 14px; background: var(--accent); animation: blink 1s infinite; vertical-align: middle; margin-left: 1px; }
+</style>
+</head>
+<body>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+
+  <!-- Collapsed state label -->
+  <div style="width:600px">
+    <div class="section-label">① Barra colapsada</div>
+    <div class="create-bar-collapsed">
+      <span>Crear una nota...</span>
+      <div class="bar-icons">
+        <button class="bar-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></button>
+        <button class="bar-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></button>
+        <button class="bar-icon"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Expanded editor -->
+  <div style="width:600px">
+    <div class="section-label">② Editor expandido activo</div>
+    <div class="create-expanded">
+      <div class="expanded-header">
+        <input class="title-input" type="text" placeholder="Título">
+        <button class="pin-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24Z"/></svg></button>
+      </div>
+
+      <div class="check-row">
+        <span class="drag-dots">⠿</span>
+        <input type="checkbox">
+        <input class="item-input" type="text" value="lectura"><span class="cursor"></span>
+        <button class="del-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+
+      <div class="add-row">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <span>Elemento de la lista</span>
+      </div>
+
+      <div class="expanded-footer">
+        <button class="foot-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg></button>
+        <button class="foot-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="13.5" cy="6.5" r=".5" fill="#a78bfa" stroke="#a78bfa"/><circle cx="17.5" cy="10.5" r=".5" fill="#38bdf8" stroke="#38bdf8"/><circle cx="8.5" cy="7.5" r=".5" fill="#ec4899" stroke="#ec4899"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z" stroke="rgba(255,255,255,0.4)"/></svg></button>
+        <button class="foot-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/></svg></button>
+        <button class="foot-btn special"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></button>
+        <button class="foot-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+        <button class="foot-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/></svg></button>
+        <button class="foot-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+        <div class="spacer"></div>
+        <button class="foot-btn"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg></button>
+        <button class="foot-btn" style="opacity:0.25"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-.49-3.5"/></svg></button>
+        <button class="close-btn">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

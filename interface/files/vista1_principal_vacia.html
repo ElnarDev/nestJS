@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=1440">
+<title>GlassKeep - Principal Vacía</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Grotesk:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --glass-bg: rgba(255,255,255,0.08);
+    --glass-border: rgba(255,255,255,0.18);
+    --glass-blur: blur(24px);
+    --accent: #a78bfa;
+    --accent2: #38bdf8;
+    --text: rgba(255,255,255,0.92);
+    --text-muted: rgba(255,255,255,0.5);
+    --shadow: 0 8px 32px rgba(0,0,0,0.3);
+  }
+  body {
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    background: #0f0c29;
+    background: linear-gradient(135deg, #0f0c29 0%, #1a0533 30%, #0c2340 60%, #041024 100%);
+    overflow: hidden;
+    position: relative;
+  }
+  /* Floating blobs */
+  .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; pointer-events: none; }
+  .blob1 { width: 500px; height: 500px; background: radial-gradient(circle, #7c3aed, transparent); top: -100px; left: -100px; }
+  .blob2 { width: 400px; height: 400px; background: radial-gradient(circle, #0ea5e9, transparent); top: 200px; right: 100px; }
+  .blob3 { width: 350px; height: 350px; background: radial-gradient(circle, #ec4899, transparent); bottom: -50px; left: 400px; }
+  .blob4 { width: 300px; height: 300px; background: radial-gradient(circle, #10b981, transparent); bottom: 100px; right: 300px; opacity: 0.25; }
+
+  /* Topbar */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; height: 64px; z-index: 100;
+    background: rgba(15, 12, 41, 0.6);
+    backdrop-filter: blur(30px);
+    border-bottom: 1px solid var(--glass-border);
+    display: flex; align-items: center; padding: 0 16px; gap: 12px;
+  }
+  .menu-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+  .menu-btn:hover { background: var(--glass-bg); }
+  .menu-btn svg { stroke: var(--text-muted); }
+  .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+  .logo-icon {
+    width: 34px; height: 34px; border-radius: 10px;
+    background: linear-gradient(135deg, #a78bfa, #38bdf8);
+    display: flex; align-items: center; justify-content: center; font-size: 18px;
+    box-shadow: 0 4px 15px rgba(167,139,250,0.4);
+  }
+  .logo-text { font-size: 20px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+
+  .search-bar {
+    flex: 1; max-width: 720px; margin: 0 auto;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--glass-border);
+    border-radius: 24px;
+    display: flex; align-items: center; padding: 0 18px; gap: 12px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s;
+  }
+  .search-bar:hover { background: rgba(255,255,255,0.11); border-color: rgba(255,255,255,0.28); }
+  .search-bar input { background: none; border: none; outline: none; color: var(--text); font-family: 'Outfit', sans-serif; font-size: 15px; width: 100%; }
+  .search-bar input::placeholder { color: var(--text-muted); }
+
+  .topbar-actions { display: flex; align-items: center; gap: 6px; margin-left: auto; }
+  .icon-btn {
+    width: 38px; height: 38px; border-radius: 50%; border: none; background: transparent;
+    cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s;
+  }
+  .icon-btn:hover { background: var(--glass-bg); }
+  .icon-btn svg { stroke: var(--text-muted); }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #a78bfa, #ec4899); border: 2px solid rgba(167,139,250,0.5); }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed; top: 64px; left: 0; bottom: 0; width: 240px; z-index: 50;
+    padding: 12px 8px;
+  }
+  .nav-item {
+    display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-radius: 0 28px 28px 0;
+    cursor: pointer; color: var(--text-muted); font-size: 14px; font-weight: 500;
+    transition: all 0.2s; margin-right: 8px;
+  }
+  .nav-item:hover { background: var(--glass-bg); color: var(--text); }
+  .nav-item.active { background: rgba(167,139,250,0.2); color: var(--accent); }
+  .nav-item svg { flex-shrink: 0; }
+
+  /* Main content */
+  .main { margin-left: 240px; padding-top: 64px; min-height: 100vh; display: flex; align-items: center; justify-content: center; flex-direction: column; }
+
+  /* Create note bar */
+  .create-bar {
+    width: 600px; margin: 0 auto 40px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow);
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .create-bar span { color: var(--text-muted); font-size: 15px; flex: 1; }
+  .create-actions { display: flex; gap: 8px; }
+  .create-icon { width: 32px; height: 32px; border-radius: 50%; border: none; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+  .create-icon:hover { background: rgba(255,255,255,0.1); }
+  .create-icon svg { stroke: var(--text-muted); }
+
+  /* Empty state */
+  .empty-state { display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .empty-icon {
+    width: 80px; height: 80px; border-radius: 50%;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: var(--glass-blur);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .empty-icon svg { stroke: var(--text-muted); width: 36px; height: 36px; }
+  .empty-text { color: var(--text-muted); font-size: 16px; font-weight: 400; letter-spacing: 0.3px; }
+</style>
+</head>
+<body>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+  <div class="blob blob3"></div>
+  <div class="blob blob4"></div>
+
+  <!-- Topbar -->
+  <header class="topbar">
+    <button class="menu-btn">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <a class="logo" href="#">
+      <div class="logo-icon">💎</div>
+      <span class="logo-text">GlassKeep</span>
+    </a>
+    <div class="search-bar">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Buscar notas...">
+    </div>
+    <div class="topbar-actions">
+      <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg></button>
+      <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></button>
+      <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/></svg></button>
+      <button class="icon-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg></button>
+      <div class="avatar"></div>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="nav-item active">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/></svg>
+      Notas
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      Recordatorios
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Editar etiquetas
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="3" width="22" height="5"/><line x1="10" y1="12" x2="14" y2="12"/></svg>
+      Archivar
+    </div>
+    <div class="nav-item">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Papelera
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="create-bar">
+      <span>Crear una nota...</span>
+      <div class="create-actions">
+        <button class="create-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></button>
+        <button class="create-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></button>
+        <button class="create-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg></button>
+      </div>
+    </div>
+    <div class="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <p class="empty-text">Cargando notas...</p>
+    </div>
+  </main>
+</body>
+</html>

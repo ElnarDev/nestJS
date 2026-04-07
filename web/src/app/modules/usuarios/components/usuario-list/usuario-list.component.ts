@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -56,7 +56,8 @@ export class UsuarioListComponent implements OnInit {
     constructor(
         private usuarioService: UsuarioService,
         private messageService: MessageService,
-        private confirmationService: ConfirmationService
+        private confirmationService: ConfirmationService,
+        private cdr: ChangeDetectorRef
     ) {}
 
     ngOnInit(): void {
@@ -68,13 +69,16 @@ export class UsuarioListComponent implements OnInit {
         this.usuarioService.getAll().subscribe({
             next: (data) => {
                 this.usuarios = data;
+                console.log(this.usuarios);
                 this.loading = false;
+                this.cdr.markForCheck();
             },
             error: (err) => {
                 const msg = err?.error?.message;
                 const detail = Array.isArray(msg) ? msg.join(', ') : (msg ?? 'No se pudo cargar la lista de usuarios.');
                 this.messageService.add({ severity: 'error', summary: 'Error', detail });
                 this.loading = false;
+                this.cdr.markForCheck();
             }
         });
     }
