@@ -27,7 +27,10 @@ export class AppMenu {
 
                 label: 'Administraci\u00f3n',
                 items: [
-                    { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/usuarios'] }
+                    { label: 'Usuarios', icon: 'pi pi-fw pi-users', routerLink: ['/usuarios'] },
+                    { label: 'Roles', icon: 'pi pi-fw pi-shield' },
+                    { label: 'Permisos', icon: 'pi pi-fw pi-lock' },
+                    { label: 'Notas', icon: 'pi pi-fw pi-file', routerLink: ['/notas'] }
                 ]
             }
         ];
